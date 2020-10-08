@@ -1,0 +1,23 @@
+[http]
+  # Add the router
+  [http.routers]
+    [http.routers.http-to-https]
+      entryPoints = ["web"]
+      middlewares = ["redirect-to-https"]
+      rule = "HostRegexp(`{host:.+}`)"
+      service = "noop@internal"
+
+  [http.routers]
+    [http.routers.http-to-https]
+      entryPoints = ["dns"]
+      rule = "Host(`*`)"
+      service = "coredns@kubernetes"
+
+  [http.middlewares]
+    [http.middlewares.redirect-to-https.redirectScheme]
+      scheme = "https"
+    [http.middlewares.admin-auth.basicAuth]
+      users = ["admin:${admin_basic_auth_enrcypted_password}"]
+    [http.middlewares.auth-gateway.forwardAuth]
+      address = "${api_gateway_url}"
+      authResponseHeaders = ["X-Smarta-Auth-Id","X-Smarta-Auth-Role","X-Smarta-Auth-Session","X-Smarta-Auth-Anonymous","X-Smarta-Auth-Superuser","X-Smarta-Auth-Issuer","X-Smarta-Auth-Phone","X-Smarta-Auth-Email"]

@@ -1,0 +1,42 @@
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+    [entryPoints.web.forwardedHeaders]
+      insecure = true
+  [entryPoints.web-secure]
+    address = ":443"
+    [entryPoints.web-secure.forwardedHeaders]
+      insecure = true
+  [entryPoints.postgres]
+    address = ":5432"
+  [entryPoints.dns]
+    address = ":53"
+
+[providers]
+  [providers.kubernetesIngress]
+  [providers.kubernetesCRD]
+  [providers.file]
+    watch = true
+    filename = "/traefik.dynamic.toml"
+
+[certificatesResolvers]
+  [certificatesResolvers.main]
+    [certificatesResolvers.main.acme]
+      email = "${lets_encrypt_email}"
+      storage = "/acme/acme.json"
+      [certificatesResolvers.main.acme.tlsChallenge]
+
+[api]
+  dashboard = true
+  insecure = true
+
+[log]
+  # level = "DEBUG"
+
+# [accessLog]
+#  [accessLog.fields]
+#    defaultMode = "keep"
+
+# TODO
+# (1) [ping] for healthhecks
+# (2) [metrics] for statsD
