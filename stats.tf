@@ -70,7 +70,7 @@ resource "kubernetes_ingress" "grafana" {
 
 data "kubernetes_secret" "grafana_password" {
   metadata {
-    name      = "basic-auth"
+    name      = "loki-grafana"
     namespace = "stats"
   }
 }
