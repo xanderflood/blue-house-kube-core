@@ -1,10 +1,16 @@
+# provider "helm" {
+#   debug = true
+#   kubernetes {
+#     config_context = "blue-house"
+#   }
+# }
 provider "kubernetes" {
-  # load_config_file = false
-  config_context = "blue-house"
+  load_config_file = false
+  # config_context = "blue-house"
 }
 provider "kubernetes-alpha" {
-  config_path    = "~/.kube/config"
-  config_context = "blue-house"
+  # config_path    = "~/.kube/config"
+  # config_context = "blue-house"
 }
 
 terraform {
