@@ -113,6 +113,10 @@ resource "kubernetes_deployment" "drone-server" {
             name  = "DRONE_USER_CREATE"
             value = "username:${var.drone_initial_admin_github_username},admin:true"
           }
+          env {
+            name  = "DRONE_LOGS_DEBUG"
+            value = true
+          }
 
           port {
             name           = "web"
@@ -164,12 +168,7 @@ resource "kubernetes_ingress" "drone" {
     annotations = {
       "kubernetes.io/ingress.class" = "traefik"
 
-      "traefik.ingress.kubernetes.io/router.entrypoints"        = "web-secure"
-      "traefik.ingress.kubernetes.io/router.tls.certresolver"   = "main"
-      "traefik.ingress.kubernetes.io/router.tls.domains.0.main" = "infra.${var.services_domain}"
-
-      # TODO configure SANs for TLS
-      # "traefik.ingress.kubernetes.io/router.tls.domains.0.sans" = "dashboard.${san}"
+      "traefik.ingress.kubernetes.io/router.entrypoints" = "web-secure"
     }
   }
 
@@ -267,7 +266,7 @@ resource "kubernetes_deployment" "drone-runner" {
             # two variables set. These variables are used by Terraform to detect
             # and in-cluster environment.
             name  = "DRONE_RUNNER_ENVIRON"
-            value = "KUBERNETES_SERVICE_HOST:${var.kubernetes_service_host},KUBERNETES_SERVICE_PORT:${var.kubernetes_service_port}"
+            value = "KUBERNETES_SERVICE_HOST:kubernetes.default.svc,KUBERNETES_SERVICE_PORT:443"
           }
 
           port {

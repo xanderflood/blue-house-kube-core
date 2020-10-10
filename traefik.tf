@@ -236,13 +236,8 @@ resource "kubernetes_ingress" "traefik-dashboard" {
     annotations = {
       "kubernetes.io/ingress.class" = "traefik"
 
-      "traefik.ingress.kubernetes.io/router.entrypoints"        = "web-secure"
-      "traefik.ingress.kubernetes.io/router.tls.certresolver"   = "main"
-      "traefik.ingress.kubernetes.io/router.tls.domains.0.main" = "dashboard.${var.services_domain}"
-      "traefik.ingress.kubernetes.io/router.middlewares"        = "admin-auth@file"
-
-      # TODO configure SANs for TLS
-      # "traefik.ingress.kubernetes.io/router.tls.domains.0.sans" = "dashboard.${san}"
+      "traefik.ingress.kubernetes.io/router.entrypoints" = "web-secure"
+      "traefik.ingress.kubernetes.io/router.middlewares" = "admin-auth@file"
     }
   }
 

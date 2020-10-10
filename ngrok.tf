@@ -29,7 +29,7 @@ resource "kubernetes_deployment" "drone-webhook-proxy" {
           name  = "drone"
 
           command = [
-            "ngrok", "http", "http://drone-server:80",
+            "ngrok", "http", "http://drone.drone.svc.cluster.local:80",
             "--subdomain", var.drone_ngrok_subdomain,
             "--authtoken", var.ngrok_auth_token,
             "--log-format", "json",

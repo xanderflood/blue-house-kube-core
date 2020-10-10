@@ -13,12 +13,6 @@ variable "drone_github_client_secret" {
 variable "drone_initial_admin_github_username" {
   type = string
 }
-variable "kubernetes_service_host" {
-  type = string
-}
-variable "kubernetes_service_port" {
-  type = string
-}
 variable "drone_ngrok_subdomain" {
   type = string
 }
