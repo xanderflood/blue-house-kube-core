@@ -1,0 +1,52 @@
+---
+kind: pipeline
+type: kubernetes
+name: blue-house-kube-core
+
+defaults:
+  image: &default_image
+    hashicorp/terraform:0.13.4
+  env: &default_env
+    KUBE_LOAD_CONFIG_FILE: false
+    TF_VAR_lets_encrypt_email:
+      from_secret: lets_encrypt_email
+    TF_VAR_services_domain:
+      from_secret: services_domain
+    TF_VAR_drone_github_client_id:
+      from_secret: drone_github_client_id
+    TF_VAR_drone_github_client_secret:
+      from_secret: drone_github_client_secret
+    TF_VAR_drone_initial_admin_github_username:
+      from_secret: drone_initial_admin_github_username
+    TF_VAR_drone_ngrok_subdomain:
+      from_secret: drone_ngrok_subdomain
+    TF_VAR_ngrok_auth_token:
+      from_secret: ngrok_auth_token
+    TF_VAR_github_org:
+      from_secret: github_org
+
+steps:
+- name: plan
+  image: *default_image
+  environment: *default_env
+
+  commands:
+  - terraform init -lock=false -input=false
+  - terraform validate
+  - terraform plan -lock=false -input=false
+  when:
+    event: [ push ]
+    branch:
+      exclude: [ master ]
+
+- name: apply
+  image: *default_image
+  environment: *default_env
+
+  commands:
+  - terraform init -lock=true -lock-timeout=0s -input=false
+  - terraform validate
+  - terraform plan -lock=true -lock-timeout=0s -input=false -out=tfplan .
+  - terraform apply -lock=true -lock-timeout=0s -input=false tfplan
+  when:
+    branch: [ master ]

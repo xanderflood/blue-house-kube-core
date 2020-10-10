@@ -1,0 +1,27 @@
+[entryPoints]
+  [entryPoints.web-secure]
+    address = ":80"
+    [entryPoints.web-secure.forwardedHeaders]
+      insecure = true
+
+[providers]
+  [providers.kubernetesIngress]
+  [providers.kubernetesCRD]
+  [providers.file]
+    watch = true
+    filename = "/traefik.dynamic.toml"
+
+[api]
+  dashboard = true
+  insecure = true
+
+[log]
+  # level = "DEBUG"
+
+[accessLog]
+ [accessLog.fields]
+   defaultMode = "keep"
+
+# TODO
+# (1) [ping] for healthhecks
+# (2) [metrics] for statsD
