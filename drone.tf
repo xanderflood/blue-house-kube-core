@@ -120,6 +120,10 @@ resource "kubernetes_deployment" "drone-server" {
             name  = "DRONE_LOGS_DEBUG"
             value = true
           }
+          env {
+            name  = "DRONE_SERVER_PROXY_HOST"
+            value = local.drone_webhook_domain
+          }
 
           port {
             name           = "web"
