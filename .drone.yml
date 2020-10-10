@@ -37,7 +37,7 @@ steps:
   when:
     event: [ push ]
     branch:
-      exclude: [ master ]
+      exclude: [ main ]
 
 - name: apply
   image: *default_image
@@ -49,4 +49,4 @@ steps:
   - terraform plan -lock=true -lock-timeout=0s -input=false -out=tfplan .
   - terraform apply -lock=true -lock-timeout=0s -input=false tfplan
   when:
-    branch: [ master ]
+    branch: [ main ]
