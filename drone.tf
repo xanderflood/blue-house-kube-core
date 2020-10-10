@@ -102,8 +102,7 @@ resource "kubernetes_deployment" "drone-server" {
           }
           env {
             name  = "DRONE_SERVER_HOST"
-            value = local.drone_webhook_domain
-            # TODO remove? value = "infra.${var.services_domain}"
+            value = "infra.${var.services_domain}"
           }
           env {
             name  = "DRONE_SERVER_PROTO"
@@ -112,6 +111,10 @@ resource "kubernetes_deployment" "drone-server" {
           env {
             name  = "DRONE_USER_CREATE"
             value = "username:${var.drone_initial_admin_github_username},admin:true"
+          }
+          env {
+            name  = "DRONE_ORGS"
+            value = "${var.github_org}"
           }
           env {
             name  = "DRONE_LOGS_DEBUG"
