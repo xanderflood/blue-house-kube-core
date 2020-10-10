@@ -31,6 +31,7 @@ steps:
   environment: *default_env
 
   commands:
+  - env
   - terraform init -lock=false -input=false
   - terraform validate
   - terraform plan -lock=false -input=false
