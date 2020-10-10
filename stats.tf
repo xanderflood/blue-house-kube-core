@@ -76,5 +76,5 @@ data "kubernetes_secret" "grafana_password" {
 }
 
 output "grafana_password" {
-  value = base64decode(data.kubernetes_secret.grafana_password.data["admin-password"])
+  value = data.kubernetes_secret.grafana_password.data["admin-password"]
 }
