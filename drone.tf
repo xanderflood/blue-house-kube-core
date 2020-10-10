@@ -114,7 +114,7 @@ resource "kubernetes_deployment" "drone-server" {
           }
           env {
             name  = "DRONE_ORGS"
-            value = "${var.github_org}"
+            value = var.github_org
           }
           env {
             name  = "DRONE_LOGS_DEBUG"
