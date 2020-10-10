@@ -21,25 +21,7 @@ resource "kubernetes_config_map" "postgres" {
   }
 }
 
-####################################################
-### Create a persistent volume for Postgres data ###
-####################################################
-resource "kubernetes_persistent_volume_claim" "postgres" {
-  metadata {
-    name      = "postgres"
-    namespace = "postgres"
-  }
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    resources {
-      requests = {
-        storage = "10Gi"
-      }
-    }
-  }
-}
-
-#########################################
+########################################
 ### Deploy the postgres server itself ###
 #########################################
 resource "kubernetes_deployment" "postgres" {
@@ -97,8 +79,9 @@ resource "kubernetes_deployment" "postgres" {
 
         volume {
           name = "postgres-data"
-          persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.postgres.metadata.0.name
+          host_path {
+            path = "/var/run/kube-pg-data"
+            type = "DirectoryOrCreate"
           }
         }
         volume {
