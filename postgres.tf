@@ -135,21 +135,21 @@ resource "kubernetes_service" "postgres" {
 ##################################
 ### Create a weaker admin user ###
 ##################################
-# provider "postgresql" {
-#   host     = "postgres.postgres.svc.cluster.local"
-#   username = "postgres"
-#   password = random_password.postgres_root_password.result
-#   sslmode  = "disable"
-# }
+provider "postgresql" {
+  host     = "postgres.postgres.svc.cluster.local"
+  username = "postgres"
+  password = random_password.postgres_root_password.result
+  sslmode  = "disable"
+}
 
-# resource "random_password" "postgres_admin_password" {
-#   length = 64
-# }
-# resource "postgresql_role" "admin" {
-#   name            = "admin"
-#   create_database = true
-#   create_role     = true
-#   login           = true
-#   password        = random_password.postgres_admin_password.result
-#   superuser       = true
-# }
+resource "random_password" "postgres_admin_password" {
+  length = 64
+}
+resource "postgresql_role" "admin" {
+  name            = "admin"
+  create_database = true
+  create_role     = true
+  login           = true
+  password        = random_password.postgres_admin_password.result
+  superuser       = true
+}
