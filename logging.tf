@@ -3,8 +3,7 @@
 ########################################################
 resource "kubernetes_cluster_role" "fluentd" {
   metadata {
-    name      = "fluentd"
-    namespace = "kube-system"
+    name = "fluentd"
   }
 
   rule {
