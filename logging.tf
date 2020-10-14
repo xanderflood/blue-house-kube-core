@@ -39,6 +39,15 @@ resource "kubernetes_daemonset" "logizio-fluentd" {
             }
           }
 
+          env {
+            name  = "LOGZIO_TOKEN"
+            value = var.logzio_token
+          }
+          env {
+            name  = "LOGZIO_url"
+            value = var.logzio_url
+          }
+
           volume_mount {
             name       = "varlog"
             mount_path = "/var/log"
