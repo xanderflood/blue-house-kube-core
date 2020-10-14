@@ -3,9 +3,9 @@ resource "kubernetes_daemonset" "logizio-fluentd" {
     name      = "fluentd-logzio"
     namespace = "kube-system"
     labels = {
-      k8s-app                         = "fluentd-logzio"
-      version                         = "v1"
-      kubernetes.io / cluster-service = "true"
+      "k8s-app"                       = "fluentd-logzio"
+      "version"                       = "v1"
+      "kubernetes.io/cluster-service" = "true"
     }
   }
 
