@@ -10,6 +10,12 @@ resource "kubernetes_daemonset" "logizio-fluentd" {
   }
 
   spec {
+    selector {
+      match_labels = {
+        "k8s-app" = "fluentd-logzio"
+      }
+    }
+
     template {
       metadata {
         labels = {
