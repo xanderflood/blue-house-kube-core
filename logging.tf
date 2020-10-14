@@ -1,3 +1,42 @@
+########################################################
+### Create a Kuberenetes Service Account for Traefik ###
+########################################################
+resource "kubernetes_cluster_role" "fluentd" {
+  metadata {
+    name = "fluentd"
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["pods", "namespaces"]
+    verbs      = ["get", "list", "watch"]
+  }
+}
+resource "kubernetes_service_account" "fluentd" {
+  metadata {
+    name      = "fluentd"
+    namespace = "kube-system"
+  }
+}
+resource "kubernetes_cluster_role_binding" "fluentd" {
+  metadata {
+    name = "fluentd"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.fluentd.metadata.0.name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.fluentd.metadata.0.name
+    namespace = "kube-system"
+  }
+}
+
+#############################################
+### Create one log-collector pod per node ###
+#############################################
 resource "kubernetes_daemonset" "logizio-fluentd" {
   metadata {
     name      = "fluentd-logzio"
@@ -26,6 +65,9 @@ resource "kubernetes_daemonset" "logizio-fluentd" {
       }
 
       spec {
+        service_account_name            = kubernetes_service_account.fluentd.metadata.0.name
+        automount_service_account_token = true
+
         toleration {
           key    = "node-role.kubernetes.io/master"
           effect = "NoSchedule"
