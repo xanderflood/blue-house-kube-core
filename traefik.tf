@@ -150,18 +150,10 @@ resource "kubernetes_deployment" "traefik" {
           port {
             name           = "web"
             container_port = 80
-            host_port      = 80
           }
           port {
             name           = "web-secure"
             container_port = 443
-            host_port      = 443
-          }
-
-          port {
-            name           = "postgres"
-            container_port = 5432
-            host_port      = 5432
           }
 
           port {
@@ -229,6 +221,27 @@ resource "kubernetes_service" "traefik-dashboard" {
     }
   }
 }
+resource "kubernetes_service" "traefik" {
+  metadata {
+    name      = "traefik"
+    namespace = "kube-system"
+  }
+
+  spec {
+    selector = {
+      app = "traefik"
+    }
+    session_affinity = "ClientIP"
+    port {
+      port        = 80
+      target_port = 80
+    }
+    port {
+      port        = 443
+      target_port = 443
+    }
+  }
+}
 resource "kubernetes_ingress" "traefik-dashboard" {
   metadata {
     name      = "traefik-dashboard"
@@ -250,6 +263,88 @@ resource "kubernetes_ingress" "traefik-dashboard" {
           backend {
             service_name = kubernetes_service.traefik-dashboard.metadata.0.name
             service_port = 80
+          }
+        }
+      }
+    }
+  }
+}
+
+####################################
+### Reverse proxy the hostports  ###
+####################################
+resource "kubernetes_config_map" "traefik-nginx" {
+  metadata {
+    name      = "traefik-nginx"
+    namespace = "kube-system"
+  }
+
+  data = {
+    "traefik.toml" = templatefile(
+      "templates/nginx.conf",
+      {
+        traefik_service_hostname = "traefik.kube-system.svc.cluster.local"
+      },
+    )
+  }
+}
+resource "kubernetes_deployment" "traefik-nginx" {
+  depends_on = [kubernetes_service.traefik]
+
+  metadata {
+    name      = "traefik"
+    namespace = "kube-system"
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "traefik"
+      }
+    }
+
+    template {
+      metadata {
+        labels      = { app = "traefik" }
+        annotations = { "${var.services_domain}/trigger" = local.traefik_restart_trigger }
+      }
+
+      spec {
+        service_account_name            = kubernetes_service_account.traefik.metadata.0.name
+        automount_service_account_token = true
+
+        container {
+          image = "traefik:v2.2"
+          name  = "traefik"
+
+          # NOTE: Kubernetes _services_ can't claim node ports below 30000 without
+          # special privileges, but deployments can, so we specify the host port
+          # here. If we later have multiple nodes, wel'l need to make sure Traefik
+          # runs as a DaemonSet, so it can take traefik on all nodes.
+          port {
+            name           = "web"
+            container_port = 80
+            host_port      = 80
+          }
+          port {
+            name           = "web-secure"
+            container_port = 443
+            host_port      = 443
+          }
+
+          volume_mount {
+            mount_path = "/default.conf"
+            name       = "nginx"
+            sub_path   = "nginx.conf"
+          }
+        }
+
+        volume {
+          name = "nginx"
+          config_map {
+            name = kubernetes_config_map.traefik-nginx.metadata.0.name
           }
         }
       }
